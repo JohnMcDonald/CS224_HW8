@@ -17,7 +17,7 @@ cmaTest.o: cmaTest.c cma.h
 	gcc -c cmaTest.c
 
 #part 1
-cma.o: cma.c cma.h
+cma.o: cma.c cma.h debug.h
 	gcc -c cma.c
 
 # part 3
