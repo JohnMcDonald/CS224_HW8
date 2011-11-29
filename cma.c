@@ -9,6 +9,7 @@
 #include "cma.h"
 
 #define ITEMNOTFOUND ((void *)-1)
+#define NXT(e) ((void*)e+e->size+sizeof(struct MemNode))  
 
 static void *class_membase=NULL;
 static void *class_limit=NULL;
@@ -150,11 +151,47 @@ void *class_malloc(size_t size) {
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 //attempt to find adjacent unused nodes and collapse them.
 static void class_garbage() {
-	//Not Implemented
+	ENTER;
+	MNode here = NULL;
+	MNode there = NULL;
 
+	here = class_nouse;
+
+	int done = 0;
+
+	while (done == 0)
+	{
+		if (here != NULL)
+		{
+			there = here->next;
+		}
+		
+		while (there != NULL)
+		{
+			if ((NXT(here) == there))
+			{
+				here->next = there->next;
+				here->size = here->size + sizeof(struct MemNode) + there->size;
+
+				class_counters.gc++;
+				done = 0;
+				break;
+			}
+			there = there->next;
+		}
+		if (there == NULL)
+		{
+			done = 1;
+		}
+	}
+	EXIT;
 }
+
+//////////////////////////////////////////////////////////////////////////////
 
 void class_free(void *ptr) {
   ENTER;
